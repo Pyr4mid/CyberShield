@@ -13,17 +13,18 @@ CORS(app)
 # إعدادات Tor (SOCKS5)
 # ============================================================
 TOR_PROXY = {
-    'http': 'socks5://127.0.0.1:9050',
-    'https': 'socks5://127.0.0.1:9050'
+    'http': 'socks5h://127.0.0.1:9050',
+    'https': 'socks5h://127.0.0.1:9050'
 }
 
 # ============================================================
 # دالة إرسال الطلب عبر Tor
 # ============================================================
-def send_via_tor(url, mode='get', timeout=10):
+def send_via_tor(url, mode='get', timeout=15):
     try:
         session = requests.Session()
         session.proxies.update(TOR_PROXY)
+        session.verify = False  # تجاوز التحقق من SSL (للمواقع التي لا تدعمه)
 
         user_agents = [
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
@@ -41,11 +42,13 @@ def send_via_tor(url, mode='get', timeout=10):
             'Connection': 'keep-alive'
         })
 
+        # إضافة معلمات عشوائية لمنع الكاش
         if '?' not in url:
             url += f"?_={int(time.time()*1000)}&r={random.randint(1,999999)}"
         else:
             url += f"&_={int(time.time()*1000)}&r={random.randint(1,999999)}"
 
+        # تنفيذ الطلب حسب الوضع
         if mode == 'post':
             response = session.post(url, json={'x': random.random()}, timeout=timeout)
         elif mode == 'slow':
@@ -55,6 +58,7 @@ def send_via_tor(url, mode='get', timeout=10):
         else:
             response = session.get(url, timeout=timeout)
 
+        # نجاح إذا كان الـ status code في القائمة
         return response.status_code in [200, 403, 404, 500, 502, 503]
 
     except Exception as e:
